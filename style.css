@@ -4,7 +4,6 @@ body {
   --mdc-theme-primary: #ff8000;
   --mdc-theme-on-primary: #ffffff;
 }
-
 video {
   clear: both;
   display: block;
@@ -14,13 +13,11 @@ video {
   height: 720px;
   width: 960px;
 }
-
-.output_canvas {
+.outputCanvas {
   transform: rotateY(180deg);
   -webkit-transform: rotateY(180deg);
   -moz-transform: rotateY(180deg);
 }
-
 .videoView {
   position: absolute;
   float: left;
@@ -29,7 +26,6 @@ video {
   cursor: not-allowed;
   min-height: 500px;
 }
-
 .videoView p {
   padding-top: 5px;
   padding-bottom: 5px;
@@ -38,13 +34,11 @@ video {
   z-index: 2;
   margin: 0;
 }
-
 .canvas {
   z-index: 1;
   position: absolute;
   pointer-events: none;
 }
-
 .output {
   display: none;
   width: 100%;

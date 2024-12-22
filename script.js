@@ -1,44 +1,42 @@
 import {GestureRecognizer,FilesetResolver,DrawingUtils} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
-
+// define constants
+const video = document.getElementById("webcam");
+const gestureOutput = document.getElementById("gestureOutput");
+const outputCanvas = document.getElementById("outputCanvas");
+const canvas = outputCanvas.getContext("2d");
+// define variables
 let recognizer;
 let button;
 let webcam;
-let results;
 let lastTime;
-
-const video = document.getElementById("webcam");
-const canvasElement = document.getElementById("output_canvas");
-const canvasCtx = canvasElement.getContext("2d");
-const gestureOutput = document.getElementById("gesture_output");
-const height = "720px";
-const width = "960px";
+// get url parameters
+const parameters = new URLSearchParams(window.location.search);
+const url = parameters.get("url")
+const port = parameters.get("port")
+const topic = parameters.get("topic")
+if (url === null || port === null || topic === null) {
+  alert("Critical error: Malformed URL. Missing required parameters!")
+}
+// load model
 const createGestureRecognizer = async () => {
-  const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm");
-  recognizer = await GestureRecognizer.createFromOptions(vision, {
+  recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
     baseOptions: {
       modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
       delegate: "GPU"
     },
     runningMode: "VIDEO",
-    numHands: 20
+    numHands: 27
   });
 };
-
-// load gesture recognizer model
 createGestureRecognizer();
-
 // check camera access support
-function hasGetUserMedia() {
-  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-}
-
-// check webcam button
-if (hasGetUserMedia()) {
+if (!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
   button = document.getElementById("button");
   button.addEventListener("click",enableWebcam);
 }
-
+// enable webcam
 function enableWebcam() {
+  // handle button text
   if (webcam === true) {
     webcam = false;
     button.innerText = "UNPAUSE VISIONARY GESTURE RECOGNITION";
@@ -46,69 +44,45 @@ function enableWebcam() {
     webcam = true;
     button.innerText = "PAUSE VISIONARY GESTURE RECOGNITION";
   }
-
-  // parameters for "getUserMedia"
-  const constraints = {
-    video: true
-  };
-
   // get webcam stream
-  navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+  navigator.mediaDevices.getUserMedia({video: true}).then(function (stream) {
     video.srcObject = stream;
-    video.addEventListener("loadeddata", predictWebcam);
+    video.addEventListener("loadeddata",predictWebcam);
   });
 }
-
-const url = ''
-const options = {
-  // Clean session
-  clean: true,
-  connectTimeout: 4000,
-  // Authentication
-  clientId: 'test1',
-  username: '',
-  password: '',
-}
-const client = mqtt.connect(url, options)
-client.subscribe('test')
-
+const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {clean: true, connectTimeout: 4000, clientId: crypto.randomUUID(), username: "", password: "",})
+client.subscribe(topic)
 async function predictWebcam() {
-  const webcamElement = document.getElementById("webcam");
-
+  let results;
   if (video.currentTime !== lastTime) {
     lastTime = video.currentTime;
     results = recognizer.recognizeForVideo(video, Date.now());
   }
-
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  const drawingUtils = new DrawingUtils(canvasCtx);
-
-  canvasElement.style.height = height;
-  canvasElement.style.width = width;
-
-  webcamElement.style.height = height;
-  webcamElement.style.width = width;
-
+  canvas.save();
+  canvas.clearRect(0,0,outputCanvas.width,outputCanvas.height);
+  // set canvas size
+  outputCanvas.style.height = "720px";
+  outputCanvas.style.width = "960px";
   // draw hand landmarks
   if (results.landmarks) {
+    const utils = new DrawingUtils(canvas);
     for (const landmarks of results.landmarks) {
-      drawingUtils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
+      utils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {
         color: "#ffd0b0",
         lineWidth: 10
       });
-      drawingUtils.drawLandmarks(landmarks, {
+      utils.drawLandmarks(landmarks, {
         color: "#ff8000",
         lineWidth: 4
       });
     }
   }
-  canvasCtx.restore();
-
+  canvas.restore();
   // display output
-  if (results.gestures.length > 0) {
+  const gestureResult = results.gestures;
+  if (gestureResult.length > 0) {
     gestureOutput.style.display = "block";
-    gestureOutput.style.width = width;
+    gestureOutput.style.width = outputCanvas.width;
     // hands
     let handBuilder = []
     for (const handedness of results.handednesses) {
@@ -117,30 +91,23 @@ async function predictWebcam() {
     let hands = handBuilder.join(", ");
     // gestures
     let gestureBuilder = []
-    for (const gesture of results.gestures) {
-      gestureBuilder.push(gesture[0].categoryName);
-
+    let confidenceBuilder = []
+    for (const gesture of gestureResult) {
+      const currentGesture = gesture[0];
+      gestureBuilder.push(currentGesture.categoryName);
+      confidenceBuilder.push((parseFloat(currentGesture.score) * 100.0).toFixed(2));
       //if (lastSent !== Date.now()) {
-      //  client.publish('test',gesture)
+      //  client.publish("test",gesture)
       //  console.log("detected");
       //}
       //lastSent = Date.now();
-
     }
     let gestures = gestureBuilder.join(", ");
-    // confidences
-    let confidenceBuilder = []
-    for (const confidence of results.gestures) {
-      confidenceBuilder.push((parseFloat(confidence[0].score) * 100.0).toFixed(2));
-    }
     let confidences = confidenceBuilder.join(", ");
-
-    gestureOutput.innerText = `Hand: ${hands}\nGesture: ${gestures}\n Confidence: ${confidences}`;
-
+    gestureOutput.innerText = "Hand: " + hands + "\nGesture: " + gestures + "\n Confidence: " + confidences;
   } else {
     gestureOutput.style.display = "none";
   }
-
   // keep animating over webcam
   if (webcam === true) {
     window.requestAnimationFrame(predictWebcam);

@@ -1,33 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <title>Visionary</title>
-
+<!-- stylesheets -->
 <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
 <link href="./style.css" rel="stylesheet">
-
+<!-- scripts -->
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"> </script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-
+<script src="./script.js" type="module"> </script>
+<!-- main section -->
 <section id="main">
-
   <div id="view" class="videoView">
-
+    <!-- main button -->
     <button id="button" class="mdc-button mdc-button--raised">
       <span class="mdc-button__ripple"></span>
       <span class="mdc-button__label">BOOT UP VISIONARY (ENABLES CAMERA)</span>
     </button>
-
+    <!-- camera output and canvas -->
     <div style="position: relative;">
       <video id="webcam" autoplay playsinline></video>
-      <canvas class="output_canvas" id="output_canvas" width="1280" height="720" style="position: absolute; left: 0; top: 0;"></canvas>
-      <p id='gesture_output' class="output">
+      <canvas id="outputCanvas" class="outputCanvas" width="1280" height="720" style="position: absolute; left: 0; top: 0;"></canvas>
+      <p id="gestureOutput" class="output">
     </div>
-
   </div>
-
 </section>
-
-<script type="module" src="./script.js"> </script>
-
 </html>
