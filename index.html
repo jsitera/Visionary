@@ -8,20 +8,71 @@
 <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"> </script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script src="./script.js" type="module"> </script>
-<!-- main section -->
-<section id="main">
-  <div id="view" class="videoView">
-    <!-- main button -->
-    <button id="button" class="mdc-button mdc-button--raised">
-      <span class="mdc-button__ripple"></span>
-      <span class="mdc-button__label">BOOT UP VISIONARY (ENABLES CAMERA)</span>
-    </button>
-    <!-- camera output and canvas -->
-    <div style="position: relative;">
-      <video id="webcam" autoplay playsinline></video>
-      <canvas id="outputCanvas" class="outputCanvas" width="1280" height="720" style="position: absolute; left: 0; top: 0;"></canvas>
-      <p id="gestureOutput" class="output">
-    </div>
-  </div>
-</section>
+<!-- title -->
+<h2>Visionary</h2>
+First, prepare your desired keybinds:
+<br><br>
+<!-- table buttons -->
+<button id="addButton" class="mdc-button mdc-button--raised">
+  <span class="mdc-button__ripple"></span>
+  <span class="mdc-button__label">ADD NEW KEYBIND</span>
+</button>
+<button id="removeButton" class="mdc-button mdc-button--raised">
+  <span class="mdc-button__ripple"></span>
+  <span class="mdc-button__label">REMOVE LAST KEYBIND</span>
+</button>
+<br><br>
+<!-- table -->
+<table id="keybinds">
+  <tr>
+    <th>Left Hand</th>
+    <th>Right Hand</th>
+    <th>Keybind</th>
+  </tr>
+  <tr>
+    <td>
+      <select>
+        <option value="None">None</option>
+        <option value="Closed_Fist">Closed Fist</option>
+        <option value="Open_Palm">Open Palm</option>
+        <option value="Pointing_Up">Pointing Up</option>
+        <option value="Thumb_Down">Thumb Down</option>
+        <option value="Thumb_Up">Thumb Up</option>
+        <option value="Victory">Victory</option>
+        <option value="ILoveYou">I Love You</option>
+      </select>
+    </td>
+    <td>
+      <select>
+        <option value="None">None</option>
+        <option value="Closed_Fist">Closed Fist</option>
+        <option value="Open_Palm">Open Palm</option>
+        <option value="Pointing_Up">Pointing Up</option>
+        <option value="Thumb_Down">Thumb Down</option>
+        <option value="Thumb_Up">Thumb Up</option>
+        <option value="Victory">Victory</option>
+        <option value="ILoveYou">I Love You</option>
+      </select>
+    </td>
+    <td>
+      <input maxlength="10">
+    </td>
+  </tr>
+</table>
+<br>
+Ready? Then press this button to start:
+<br><br>
+<!-- start button -->
+<button id="startButton" class="mdc-button mdc-button--raised">
+  <span class="mdc-button__ripple"></span>
+  <span class="mdc-button__label">BOOT UP VISIONARY (ENABLES CAMERA)</span>
+</button>
+<br><br>
+<!-- camera and canvas -->
+<div class="main">
+  <video id="camera" autoplay playsinline></video>
+  <canvas id="canvas" width="960" height="720"></canvas>
+</div>
+<br>
+<p id="output"></p>
 </html>
