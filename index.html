@@ -1,29 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
 <title>Visionary</title>
-<!-- stylesheets -->
-<link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
 <link href="./style.css" rel="stylesheet">
-<!-- scripts -->
-<script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"> </script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-<script src="./script.js" type="module"> </script>
-<!-- title -->
-<h2>Visionary</h2>
+<script src="./script.js" type="module"></script>
+<script src="./bundle.js"></script>
+<br>
+<h1>Visionary</h1>
 First, prepare your desired keybinds:
 <br><br>
-<!-- table buttons -->
-<button id="addButton" class="mdc-button mdc-button--raised">
-  <span class="mdc-button__ripple"></span>
-  <span class="mdc-button__label">ADD NEW KEYBIND</span>
-</button>
-<button id="removeButton" class="mdc-button mdc-button--raised">
-  <span class="mdc-button__ripple"></span>
-  <span class="mdc-button__label">REMOVE LAST KEYBIND</span>
-</button>
+<md-filled-button id="addButton">
+  <svg slot="icon" viewBox="0 -960 960 960"><path d="M360-640v-60h360v60H360Zm0 120v-60h360v60H360Zm140 380H180h320Zm0 60H225q-43.75 0-74.37-30.63Q120-141.25 120-185v-135h120v-560h600v381q-15-2-30.37-.03-15.38 1.97-29.63 7.03v-328H300v500h292l-60 60H180v75q0 19.12 13 32.06Q206-140 224-140h276v60Zm60 0v-123l221-220q9-9 20-13t22-4q12 0 23 4.5t20 13.5l37 37q9 9 13 20t4 22q0 11-4.5 22.5T902.09-300L683-80H560Zm300-263-37-37 37 37ZM620-140h38l121-122-18-19-19-18-122 121v38Zm141-141-19-18 37 37-18-19Z"/></svg>
+  Add Keybind
+</md-filled-button>
+<md-filled-button id="removeButton">
+  Remove Keybind
+  <svg slot="icon" viewBox="0 -960 960 960"><path d="m762-191-85 85-42-42 85-85-85-85 42-42 85 85 85-85 42 42-85 85 85 85-42 42-85-85ZM225-80q-44 0-74.5-30.5T120-185v-135h120v-560h600v446q-14-5-29-8t-31-5v-373H300v500h266q-6 14-10 29t-6 31H180v75q0 19 13 32t31 13h345q8 17 19 32t24 28H225Zm135-560v-60h360v60H360Zm0 120v-60h360v60H360Zm209 380H180h370-2 21Z"/></svg>
+</md-filled-button>
 <br><br>
-<!-- table -->
-<table id="keybinds">
+<table id="keybinds" class="keybinds">
   <tr>
     <th>Left Hand</th>
     <th>Right Hand</th>
@@ -31,48 +25,47 @@ First, prepare your desired keybinds:
   </tr>
   <tr>
     <td>
-      <select>
-        <option value="None">None</option>
-        <option value="Closed_Fist">Closed Fist</option>
-        <option value="Open_Palm">Open Palm</option>
-        <option value="Pointing_Up">Pointing Up</option>
-        <option value="Thumb_Down">Thumb Down</option>
-        <option value="Thumb_Up">Thumb Up</option>
-        <option value="Victory">Victory</option>
-        <option value="ILoveYou">I Love You</option>
-      </select>
+      <md-outlined-select required>
+        <md-select-option selected value="None">None</md-select-option>
+        <md-select-option value="Closed_Fist">Closed Fist</md-select-option>
+        <md-select-option value="Open_Palm">Open Palm</md-select-option>
+        <md-select-option value="Pointing_Up">Pointing Up</md-select-option>
+        <md-select-option value="Thumb_Down">Thumbs Down</md-select-option>
+        <md-select-option value="Thumb_Up">Thumbs Up</md-select-option>
+        <md-select-option value="Victory">Victory</md-select-option>
+        <md-select-option value="ILoveYou">I Love You</md-select-option>
+      </md-outlined-select>
     </td>
     <td>
-      <select>
-        <option value="None">None</option>
-        <option value="Closed_Fist">Closed Fist</option>
-        <option value="Open_Palm">Open Palm</option>
-        <option value="Pointing_Up">Pointing Up</option>
-        <option value="Thumb_Down">Thumb Down</option>
-        <option value="Thumb_Up">Thumb Up</option>
-        <option value="Victory">Victory</option>
-        <option value="ILoveYou">I Love You</option>
-      </select>
+      <md-outlined-select required>
+        <md-select-option selected value="None">None</md-select-option>
+        <md-select-option value="Closed_Fist">Closed Fist</md-select-option>
+        <md-select-option value="Open_Palm">Open Palm</md-select-option>
+        <md-select-option value="Pointing_Up">Pointing Up</md-select-option>
+        <md-select-option value="Thumb_Down">Thumbs Down</md-select-option>
+        <md-select-option value="Thumb_Up">Thumbs Up</md-select-option>
+        <md-select-option value="Victory">Victory</md-select-option>
+        <md-select-option value="ILoveYou">I Love You</md-select-option>
+      </md-outlined-select>
     </td>
     <td>
-      <input maxlength="10">
+      <md-outlined-text-field label="Label" value=""></md-outlined-text-field>
     </td>
   </tr>
 </table>
+<br><br>
+<md-divider></md-divider>
 <br>
 Ready? Then press this button to start:
 <br><br>
-<!-- start button -->
-<button id="startButton" class="mdc-button mdc-button--raised">
-  <span class="mdc-button__ripple"></span>
-  <span class="mdc-button__label">BOOT UP VISIONARY (ENABLES CAMERA)</span>
-</button>
+<md-outlined-button id="startButton">BOOT UP VISIONARY (ENABLES CAMERA)</md-outlined-button>
 <br><br>
-<!-- camera and canvas -->
-<div class="main">
+<md-divider></md-divider>
+<br><br>
+<div class="grid">
   <video id="camera" autoplay playsinline></video>
   <canvas id="canvas" width="960" height="720"></canvas>
 </div>
-<br>
+<br><br>
+<md-divider></md-divider>
 <p id="output"></p>
-</html>

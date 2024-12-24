@@ -1,32 +1,89 @@
 body {
-  background-color: #413a34;
+  background-color: #34322e;
   color: #ffffff;
-  --mdc-theme-primary: #ff8000;
-  --mdc-theme-on-primary: #ffffff;
-  margin: 10px;
+
+  margin: 0 auto;
+  width: 720px;
+  border-left: 2px solid #ff8000;
+  border-right: 2px solid #ff8000;
+  text-align: center;
+  min-height: 100vh;
+
+  --md-sys-typescale-body-large-font: "Arial", serif;
+  --md-sys-typescale-body-medium-font: "Arial", serif;
+  --md-sys-typescale-body-small-font: "Arial", serif;
+
+  --md-sys-typescale-label-large-font: "Arial", serif;
+  --md-sys-typescale-label-medium-font: "Arial", serif;
+  --md-sys-typescale-label-small-font: "Arial", serif;
+
+  font-family: "Arial", serif;
+  font-weight: 500;
+
+  --md-sys-color: #ff8000;
+  --md-sys-color-background: #ff8000;
+
+  --md-sys-color-on-primary: #FFFFFF;
+  --md-sys-color-on-primary-container: #FFFFFF;
+
+  --md-sys-color-on-surface: #ffffff;
+  --md-sys-color-on-surface-variant: #ffffff;
+
+  --md-sys-color-primary: #ff8000;
+  --md-sys-color-primary-container: #6c3600;
+  --md-sys-color-secondary: #ff8000;
+  --md-sys-color-secondary-container: #ff8000;
+
+  --md-sys-color-surface: #ff8000;
+  --md-sys-color-surface-container: #ff8000;
+
+  --md-sys-color-outline: #ff8000;
+  --md-sys-color-outline-variant: #ff8000;
+
+  --md-divider-thickness: 2px;
+}
+md-outlined-select::part(menu) {
+  --md-menu-container-shape: 5px;
+  --md-menu-container-color: #602f00;
+  --md-menu-item-label-text-color: #ffffff;
+  --md-menu-item-label-text-font: "Arial", serif;
 }
 video {
-  width: 960px;
-  height: 720px;
+  grid-column: 1;
+  grid-row: 1;
+  transform: rotateY(180deg);
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 30px;
 }
 canvas {
-  position: absolute;
-  left: 0;
-  top: 0;
+  grid-column: 1;
+  grid-row: 1;
+  transform: rotateY(180deg);
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 30px;
 }
 p {
   background-color: #ff8000;
   color: #ffffff;
   margin: 0;
   text-align: center;
-  width: 960px;
-  padding-top: 10px;
-  padding-bottom: 10px;
+  width: 100%;
   font-size: calc(8px + 1.2vw);
-  border-radius: 5px;
 }
-.main {
-  width: 960px;
-  height: 720px;
-  transform: rotateY(180deg);
+.grid {
+  display: grid;
+  position: relative;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.keybinds {
+  margin-left: auto;
+  margin-right: auto;
 }

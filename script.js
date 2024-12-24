@@ -20,17 +20,18 @@ let cameraStatus;
 let resultsCache;
 let lastTime;
 let lastKeybind;
-// load model
-const recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
-  baseOptions: {
-    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
-    delegate: "GPU"
-  },
-  runningMode: "VIDEO",
-  numHands: 2
-});
+let recognizer;
 startButton.addEventListener("click", enableWebcam);
-function enableWebcam() {
+async function enableWebcam() {
+// load model
+  recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
+    baseOptions: {
+      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numHands: 2
+  });
   if (cameraStatus === true) {
     cameraStatus = false;
     startButton.innerText = "UNPAUSE VISIONARY GESTURE RECOGNITION";
@@ -40,7 +41,7 @@ function enableWebcam() {
   }
   window.navigator.mediaDevices.getUserMedia({video: true}).then(function (stream) {
     camera.srcObject = stream;
-    camera.addEventListener("loadeddata", predictWebcam);
+    camera.addEventListener("loadeddata",predictWebcam);
   });
 }
 addButton.addEventListener("click",addKeybind);
@@ -57,14 +58,14 @@ function removeKeybind() {
     table.deleteRow(table.rows.length - 1);
   }
 }
-const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
-  clean: true,
-  connectTimeout: 4000,
-  clientId: crypto.randomUUID(),
-  username: "",
-  password: "",
-})
-client.subscribe(topic)
+//const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
+//  clean: true,
+//  connectTimeout: 4000,
+//  clientId: crypto.randomUUID(),
+//  username: "",
+//  password: "",
+//})
+//client.subscribe(topic)
 window.setInterval(sendGesture,1000);
 async function predictWebcam() {
   if (camera.currentTime !== lastTime) {
