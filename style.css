@@ -4,8 +4,8 @@ body {
 
   margin: 0 auto;
   width: 720px;
-  border-left: 2px solid #ff8000;
-  border-right: 2px solid #ff8000;
+  border-left: 1px solid #aa5500;
+  border-right: 1px solid #aa5500;
   text-align: center;
   min-height: 100vh;
 
@@ -38,12 +38,10 @@ body {
   --md-sys-color-surface-container: #ff8000;
 
   --md-sys-color-outline: #ff8000;
-  --md-sys-color-outline-variant: #ff8000;
-
-  --md-divider-thickness: 2px;
+  --md-sys-color-outline-variant: #aa5500;
 }
 md-outlined-select::part(menu) {
-  --md-menu-container-shape: 5px;
+  --md-menu-container-shape: 10px;
   --md-menu-container-color: #602f00;
   --md-menu-item-label-text-color: #ffffff;
   --md-menu-item-label-text-font: "Arial", serif;

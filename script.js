@@ -15,23 +15,22 @@ const topic = parameters.get("topic")
 if (url === null || port === null || topic === null) {
   alert("Critical error: Malformed URL. Missing required parameters!")
 }
+// load model
+const recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
+  baseOptions: {
+    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+    delegate: "GPU"
+  },
+  runningMode: "VIDEO",
+  numHands: 2
+});
 // define variables
 let cameraStatus;
 let resultsCache;
 let lastTime;
 let lastKeybind;
-let recognizer;
 startButton.addEventListener("click", enableWebcam);
 async function enableWebcam() {
-// load model
-  recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
-    baseOptions: {
-      modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
-      delegate: "GPU"
-    },
-    runningMode: "VIDEO",
-    numHands: 2
-  });
   if (cameraStatus === true) {
     cameraStatus = false;
     startButton.innerText = "UNPAUSE VISIONARY GESTURE RECOGNITION";
@@ -58,14 +57,14 @@ function removeKeybind() {
     table.deleteRow(table.rows.length - 1);
   }
 }
-//const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
-//  clean: true,
-//  connectTimeout: 4000,
-//  clientId: crypto.randomUUID(),
-//  username: "",
-//  password: "",
-//})
-//client.subscribe(topic)
+const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
+  clean: true,
+  connectTimeout: 4000,
+  clientId: crypto.randomUUID(),
+  username: "",
+  password: "",
+})
+client.subscribe(topic)
 window.setInterval(sendGesture,1000);
 async function predictWebcam() {
   if (camera.currentTime !== lastTime) {
@@ -73,7 +72,7 @@ async function predictWebcam() {
     resultsCache = recognizer.recognizeForVideo(camera, Date.now());
   }
   drawingCanvas.save();
-  drawingCanvas.clearRect(0, 0, canvas.width, canvas.height);
+  drawingCanvas.clearRect(0,0,960,720);
   // draw hand landmarks
   const landmarksResult = resultsCache.landmarks;
   if (landmarksResult.length > 0) {
@@ -134,17 +133,13 @@ async function sendGesture() {
   // get gestures
   const leftGesture = resultsCache.gestures[leftHand][0].categoryName;
   const rightGesture = resultsCache.gestures[rightHand][0].categoryName;
-
   const rows = document.getElementById("keybinds").rows;
   // get requirements
   for (let i = 1; i < rows.length; i++) {
     const row = rows[i];
-    const leftRequirement = row.cells[0].getElementsByTagName("select")[0].value;
-    console.log(leftRequirement);
-    const rightRequirement = row.cells[1].getElementsByTagName("select")[0].value;
-    console.log(rightRequirement);
-    const keybind = row.cells[2].getElementsByTagName("input")[0].value;
-    console.log(keybind);
+    const leftRequirement = row.cells[0].getElementsByTagName("md-outlined-select")[0].value;
+    const rightRequirement = row.cells[1].getElementsByTagName("md-outlined-select")[0].value;
+    const keybind = row.cells[2].getElementsByTagName("md-outlined-text-field")[0].value;
     // send gesture
     if (keybind === lastKeybind) {
       continue;
