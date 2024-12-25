@@ -72,7 +72,7 @@ async function predictWebcam() {
     resultsCache = recognizer.recognizeForVideo(camera, Date.now());
   }
   drawingCanvas.save();
-  drawingCanvas.clearRect(0,0,960,720);
+  drawingCanvas.clearRect(0,0,canvas.width,canvas.height);
   // draw hand landmarks
   const landmarksResult = resultsCache.landmarks;
   if (landmarksResult.length > 0) {
