@@ -1,51 +1,72 @@
 body {
-  background-color: #34322e;
-  color: #ffffff;
+  background-color: black;
+  color: white;
 
-  margin: 0 auto;
-  width: 720px;
-  border-left: 1px solid #aa5500;
-  border-right: 1px solid #aa5500;
+  animation: fadeInAnimation ease 3s;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+
   text-align: center;
-  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: large;
 
-  --md-sys-typescale-body-large-font: "Arial", serif;
-  --md-sys-typescale-body-medium-font: "Arial", serif;
-  --md-sys-typescale-body-small-font: "Arial", serif;
+  --md-ref-typeface-plain: Arial, Helvetica, sans-serif;
 
-  --md-sys-typescale-label-large-font: "Arial", serif;
-  --md-sys-typescale-label-medium-font: "Arial", serif;
-  --md-sys-typescale-label-small-font: "Arial", serif;
+  --md-sys-color-on-primary: white;
+  --md-sys-color-on-primary-container: white;
 
-  font-family: "Arial", serif;
-  font-weight: 500;
+  --md-sys-color-on-surface: white;
+  --md-sys-color-on-surface-variant: white;
 
-  --md-sys-color: #ff8000;
-  --md-sys-color-background: #ff8000;
+  --md-outlined-select-text-field-focus-outline-color: white;
+  --md-outlined-text-field-focus-label-text-color: white;
+  --md-outlined-text-field-focus-outline-color: white;
+  --md-outlined-text-field-focus-caret-color: white;
 
-  --md-sys-color-on-primary: #FFFFFF;
-  --md-sys-color-on-primary-container: #FFFFFF;
+  --md-sys-color-primary: black;
+  --md-sys-color-primary-container: black;
+  --md-sys-color-secondary: black;
+  --md-sys-color-secondary-container: black;
 
-  --md-sys-color-on-surface: #ffffff;
-  --md-sys-color-on-surface-variant: #ffffff;
+  --md-sys-color-surface: black;
+  --md-sys-color-surface-container: black;
 
-  --md-sys-color-primary: #ff8000;
-  --md-sys-color-primary-container: #6c3600;
-  --md-sys-color-secondary: #ff8000;
-  --md-sys-color-secondary-container: #ff8000;
-
-  --md-sys-color-surface: #ff8000;
-  --md-sys-color-surface-container: #ff8000;
-
-  --md-sys-color-outline: #ff8000;
-  --md-sys-color-outline-variant: #aa5500;
+  --md-sys-color-outline: black;
+  --md-sys-color-outline-variant: black;
 }
-md-outlined-select::part(menu) {
-  --md-menu-container-shape: 10px;
-  --md-menu-container-color: #602f00;
-  --md-menu-item-label-text-color: #ffffff;
-  --md-menu-item-label-text-font: "Arial", serif;
+
+@keyframes fadeInAnimation {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
+
+.stars {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.keybinds {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid {
+  margin: auto;
+  display: grid;
+  width: 75%;
+  height: 75%;
+}
+
 video {
   grid-column: 1;
   grid-row: 1;
@@ -55,8 +76,12 @@ video {
   max-height: 100%;
   max-width: 100%;
   border-radius: 30px;
+  z-index: 1;
+  opacity: 0.75;
+  filter: grayscale(100%);
 }
-canvas {
+
+.canvas {
   grid-column: 1;
   grid-row: 1;
   transform: rotateY(180deg);
@@ -65,23 +90,27 @@ canvas {
   max-height: 100%;
   max-width: 100%;
   border-radius: 30px;
+  z-index: 2;
 }
-p {
-  background-color: #ff8000;
-  color: #ffffff;
-  margin: 0;
-  text-align: center;
-  width: 100%;
-  font-size: calc(8px + 1.2vw);
+
+.outer-circle {
+  grid-column: 1;
+  grid-row: 1;
+  height: 50px;
+  width: 50px;
+  margin: auto;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  z-index: 3;
 }
-.grid {
-  display: grid;
-  position: relative;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-}
-.keybinds {
-  margin-left: auto;
-  margin-right: auto;
+
+.inner-circle {
+  grid-column: 1;
+  grid-row: 1;
+  height: 1px;
+  width: 1px;
+  margin: auto;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  z-index: 4;
 }

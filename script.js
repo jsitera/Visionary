@@ -1,4 +1,8 @@
-import {GestureRecognizer, FilesetResolver, DrawingUtils} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
+import {
+  DrawingUtils,
+  FilesetResolver,
+  GestureRecognizer
+} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3";
 // define constants
 const camera = window.document.getElementById("camera");
 const output = window.document.getElementById("output");
@@ -6,6 +10,7 @@ const canvas = window.document.getElementById("canvas");
 const startButton = window.document.getElementById("startButton");
 const addButton = window.document.getElementById("addButton");
 const removeButton = window.document.getElementById("removeButton");
+const circle = window.document.getElementById("circle");
 const drawingCanvas = canvas.getContext("2d");
 // get url parameters
 const parameters = new URLSearchParams(window.location.search);
@@ -14,22 +19,74 @@ const port = parameters.get("port")
 const topic = parameters.get("topic")
 if (url === null || port === null || topic === null) {
   alert("Critical error: Malformed URL. Missing required parameters!")
+  throw new Error("Malformed URL. Missing required parameters!")
 }
-// load model
-const recognizer = await GestureRecognizer.createFromOptions(await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"), {
-  baseOptions: {
-    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
-    delegate: "GPU"
-  },
-  runningMode: "VIDEO",
-  numHands: 2
-});
+const topicX = topic + "_x"
+const topicY = topic + "_y"
 // define variables
+let recognizer;
 let cameraStatus;
 let resultsCache;
 let lastTime;
 let lastKeybind;
+let circleSize = 1;
+let x = 0;
+let y = 0;
+let lastX = 0;
+let lastY = 0;
+// load model
+const createGestureRecognizer = async () => {
+  const vision = await FilesetResolver.forVisionTasks(
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.3/wasm"
+  );
+  recognizer = await GestureRecognizer.createFromOptions(vision, {
+    baseOptions: {
+      modelAssetPath:
+        "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+      delegate: "GPU"
+    },
+    runningMode: "VIDEO",
+    numHands: 2
+  });
+};
+createGestureRecognizer();
+// button functionality
 startButton.addEventListener("click", enableWebcam);
+addButton.addEventListener("click", addKeybind);
+removeButton.addEventListener("click", removeKeybind);
+// prepare mqtt client
+const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
+  clean: true,
+  connectTimeout: 4000,
+  clientId: crypto.randomUUID(),
+  username: "",
+  password: "",
+})
+client.subscribe(topic)
+client.subscribe(topicX)
+client.subscribe(topicY)
+// schedule tasks
+window.setInterval(sendGesture, 1000);
+window.setInterval(sendLocation, 1000);
+
+function addKeybind() {
+  const table = document.getElementById("keybinds");
+  const row = table.rows[1];
+  const clone = row.cloneNode(true);
+  table.appendChild(clone);
+}
+
+function removeKeybind() {
+  const table = document.getElementById("keybinds");
+  if (table.rows.length > 2) {
+    table.deleteRow(table.rows.length - 1);
+  }
+}
+
+function oppositeHand(hand) {
+  return hand === "Left" ? "Right" : "Left";
+}
+
 async function enableWebcam() {
   if (cameraStatus === true) {
     cameraStatus = false;
@@ -40,46 +97,34 @@ async function enableWebcam() {
   }
   window.navigator.mediaDevices.getUserMedia({video: true}).then(function (stream) {
     camera.srcObject = stream;
-    camera.addEventListener("loadeddata",predictWebcam);
+    camera.addEventListener("loadeddata", predictWebcam);
   });
 }
-addButton.addEventListener("click",addKeybind);
-removeButton.addEventListener("click",removeKeybind);
-function addKeybind() {
-  const table = document.getElementById("keybinds");
-  const row = table.rows[1];
-  const clone = row.cloneNode(true);
-  table.appendChild(clone);
-}
-function removeKeybind() {
-  const table = document.getElementById("keybinds");
-  if (table.rows.length > 2) {
-    table.deleteRow(table.rows.length - 1);
-  }
-}
-const client = mqtt.connect("wss://" + url + ":" + port + "/mqtt", {
-  clean: true,
-  connectTimeout: 4000,
-  clientId: crypto.randomUUID(),
-  username: "",
-  password: "",
-})
-client.subscribe(topic)
-window.setInterval(sendGesture,1000);
+
 async function predictWebcam() {
   if (camera.currentTime !== lastTime) {
     lastTime = camera.currentTime;
     resultsCache = recognizer.recognizeForVideo(camera, Date.now());
   }
   drawingCanvas.save();
-  drawingCanvas.clearRect(0,0,canvas.width,canvas.height);
+  drawingCanvas.clearRect(0, 0, canvas.width, canvas.height);
   // draw hand landmarks
   const landmarksResult = resultsCache.landmarks;
   if (landmarksResult.length > 0) {
     const utils = new DrawingUtils(drawingCanvas);
     for (const landmarks of landmarksResult) {
-      utils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {color: "#ffd0b0", lineWidth: 10});
-      utils.drawLandmarks(landmarks, {color: "#ff8000", lineWidth: 4});
+      utils.drawConnectors(landmarks, GestureRecognizer.HAND_CONNECTIONS, {color: "#646464", lineWidth: 10});
+      utils.drawLandmarks(landmarks, {color: "#ffffff", lineWidth: 4});
+      x = landmarks[8].x;
+      y = landmarks[8].y;
+      if (x < 0.53 && x > 0.47 && y < 0.53 && y > 0.47) {
+        circleSize += 1;
+        circle.style.width = circleSize + "px";
+        circle.style.height = circleSize + "px";
+        if (circleSize > 50) {
+          circleSize = 1;
+        }
+      }
     }
   }
   drawingCanvas.restore();
@@ -99,7 +144,7 @@ async function predictWebcam() {
       const currentGesture = gesture[0];
       const name = currentGesture.categoryName;
       gestureBuilder.push(name);
-      confidenceBuilder.push((parseFloat(currentGesture.score) * 100.0).toFixed(2));
+      confidenceBuilder.push((currentGesture.score * 100.0).toFixed(2));
     }
     let gestures = gestureBuilder.join(", ");
     let confidences = confidenceBuilder.join(", ");
@@ -109,6 +154,18 @@ async function predictWebcam() {
     window.requestAnimationFrame(predictWebcam);
   }
 }
+
+async function sendLocation() {
+  if (x !== lastX) {
+    client.publish(topicX, x.toString())
+    lastX = x;
+  }
+  if (y !== lastY) {
+    client.publish(topicY, y.toString())
+    lastY = y;
+  }
+}
+
 async function sendGesture() {
   if (resultsCache === undefined) {
     return;
@@ -150,7 +207,4 @@ async function sendGesture() {
       console.log("Sent gesture: " + keybind);
     }
   }
-}
-function oppositeHand(hand) {
-  return hand === "Left" ? "Right" : "Left";
 }
